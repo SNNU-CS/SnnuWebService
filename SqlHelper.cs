@@ -13,7 +13,7 @@ namespace SnnuWebService
     public class SqlHelper
     {
         //连接字符串
-        public static string Conn = "Database='dbs';Data Source = 'localhost'; User Id = 'root'; Password='root';charset='utf8';pooling=true"; 
+        public static string Conn = "Database='dbs';Data Source = 'localhost'; User Id = 'root'; Password='root';charset='utf8';pooling=true";
 
         //私有构造函数
         private SqlHelper() { }

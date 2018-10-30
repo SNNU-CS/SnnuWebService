@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -16,12 +17,18 @@ namespace SnnuWebService
     // [System.Web.Script.Services.ScriptService]
     public class News : System.Web.Services.WebService
     {
-
+        private DAL.Message dal = new DAL.Message();
         [WebMethod(Description =
             "所支持查询的部门")]
         public string[] getSupportDep()
         {
             List<string> ret = new List<string>();
+            MySqlDataReader reader = dal.AllDep();
+            while (reader.Read())
+            {
+                ret.Add(reader.GetValue(0).ToString());
+            }
+            reader.Close();
             return ret.ToArray();
         }
         [WebMethod(Description =
@@ -29,6 +36,17 @@ namespace SnnuWebService
         public Model.Message[] getNewsByDepartment(string dep)
         {
             List<Model.Message> ret = new List<Model.Message>();
+            MySqlDataReader reader = dal.QueryByDepartment(dep, "新闻");
+            while (reader.Read())
+            {
+                Model.Message temp = new Model.Message();
+                temp.Department = reader["Department"].ToString();
+                temp.Title = reader["Title"].ToString();
+                temp.Link = reader["Link"].ToString();
+                temp.Type = "新闻";
+                temp.Date = DateTime.Parse(reader["Date"].ToString());
+                ret.Add(temp);
+            }
             return ret.ToArray();
         }
         [WebMethod(Description =
@@ -36,6 +54,23 @@ namespace SnnuWebService
         public Model.Message[] getNewsByDate(string date)
         {
             List<Model.Message> ret = new List<Model.Message>();
+            DateTime d;
+            bool flag = DateTime.TryParse(date, out d);
+            if (flag == false)
+                return null;
+            DateTime start = d.AddDays(-7);
+            DateTime end = d.AddDays(7);
+            MySqlDataReader reader = dal.QueryByDate(start, end, "新闻");
+            while (reader.Read())
+            {
+                Model.Message temp = new Model.Message();
+                temp.Department = reader["Department"].ToString();
+                temp.Title = reader["Title"].ToString();
+                temp.Link = reader["Link"].ToString();
+                temp.Type = "新闻";
+                temp.Date = DateTime.Parse(reader["Date"].ToString());
+                ret.Add(temp);
+            }
             return ret.ToArray();
         }
         [WebMethod(Description =
@@ -43,6 +78,23 @@ namespace SnnuWebService
         public Model.Message[] getNewsByDepartmentAndDate(string dep, string date)
         {
             List<Model.Message> ret = new List<Model.Message>();
+            DateTime d;
+            bool flag = DateTime.TryParse(date, out d);
+            if (flag == false)
+                return null;
+            DateTime start = d.AddDays(-7);
+            DateTime end = d.AddDays(7);
+            MySqlDataReader reader = dal.QueryByDateAndDep(start, end, dep, "新闻");
+            while (reader.Read())
+            {
+                Model.Message temp = new Model.Message();
+                temp.Department = reader["Department"].ToString();
+                temp.Title = reader["Title"].ToString();
+                temp.Link = reader["Link"].ToString();
+                temp.Type = "通知";
+                temp.Date = DateTime.Parse(reader["Date"].ToString());
+                ret.Add(temp);
+            }
             return ret.ToArray();
         }
         [WebMethod(Description =
@@ -50,6 +102,17 @@ namespace SnnuWebService
         public Model.Message[] getNewsByLikeTitle(string keyword)
         {
             List<Model.Message> ret = new List<Model.Message>();
+            MySqlDataReader reader = dal.QueryByLikeTitle(keyword, "新闻");
+            while (reader.Read())
+            {
+                Model.Message temp = new Model.Message();
+                temp.Department = reader["Department"].ToString();
+                temp.Title = reader["Title"].ToString();
+                temp.Link = reader["Link"].ToString();
+                temp.Type = "新闻";
+                temp.Date = DateTime.Parse(reader["Date"].ToString());
+                ret.Add(temp);
+            }
             return ret.ToArray();
         }
     }
