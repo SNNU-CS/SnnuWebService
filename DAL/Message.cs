@@ -1,11 +1,13 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
+using System.Configuration;
 using System.Text;
 
 namespace SnnuWebService.DAL
 {
     public class Message
     {
+        private SqlHelper sqlhelper = new SqlHelper(ConfigurationManager.ConnectionStrings["Conn"].ConnectionString);
         /// <summary>
         /// 
         /// </summary>
@@ -14,7 +16,7 @@ namespace SnnuWebService.DAL
         {
             StringBuilder strSql = new StringBuilder();
             strSql.Append("select distinct Department from Message");
-            return SqlHelper.ExecuteReader(strSql.ToString());
+            return sqlhelper.ExecuteReader(strSql.ToString());
         }
         
         public MySqlDataReader QueryByDate(DateTime start,DateTime end,string type)
@@ -24,7 +26,7 @@ namespace SnnuWebService.DAL
             strSql.Append(" where Type='" + type + "' ");
             strSql.Append("and Date between '"+start.ToString("yyyy-MM-dd") +"' and '");
             strSql.Append(end.ToString("yyyy-MM-dd") + "'");
-            return SqlHelper.ExecuteReader(strSql.ToString());
+            return sqlhelper.ExecuteReader(strSql.ToString());
         }
         public MySqlDataReader QueryByDateAndDep(DateTime start, DateTime end, string dep,string type)
         {
@@ -34,7 +36,7 @@ namespace SnnuWebService.DAL
             strSql.Append("and " + "Department='" + dep + "' ");
             strSql.Append("and Date between '" + start.ToString("yyyy-MM-dd") + "' and '");
             strSql.Append(end.ToString("yyyy-MM-dd") + "'");
-            return SqlHelper.ExecuteReader(strSql.ToString());
+            return sqlhelper.ExecuteReader(strSql.ToString());
         }
         public MySqlDataReader QueryByLikeTitle(string keyworld,string type)
         {
@@ -42,7 +44,7 @@ namespace SnnuWebService.DAL
             strSql.Append("select * from Message");
             strSql.Append(" where Type='" + type + "' ");
             strSql.Append("and title like '%" + keyworld + "%'");
-            return SqlHelper.ExecuteReader(strSql.ToString());
+            return sqlhelper.ExecuteReader(strSql.ToString());
         }
         public MySqlDataReader QueryByDepartment(string dep,string type)
         {

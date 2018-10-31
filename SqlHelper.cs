@@ -2,17 +2,37 @@
 using System;
 using System.Collections;
 using System.Data;
+using System.Text;
 
 namespace SnnuWebService
 {
     public class SqlHelper
     {
         //连接字符串
-        public static string Conn = "Database='dbs';Data Source = 'localhost'; User Id = 'root'; Password='root';charset='utf8';pooling=true";
+        private string Conn;
+
 
         //私有构造函数
-        private SqlHelper() { }
-
+        public SqlHelper(string Database , string DataSource , string UserId , string Password , string charset , bool pooling)
+        {
+            StringBuilder str = new StringBuilder();
+            str.Append("Database='" + Database + "';");
+            str.Append("DataSource='" + DataSource + "';");
+            str.Append("User Id='" + UserId + "';");
+            str.Append("Password='" + Password + "';");
+            str.Append("charset='" + charset + "';");
+            if (pooling)
+            {
+                str.Append("Pooling='true';");
+            }
+            else
+                str.Append("Pooling='false'");
+            Conn = str.ToString();
+        }
+        public SqlHelper(string Conn)
+        {
+            this.Conn = Conn;
+        }
 
         /// <summary> 
         /// 准备执行一个命令 
@@ -50,7 +70,7 @@ namespace SnnuWebService
         /// <param name="cmdText">存储过程名称或者sql命令语句</param> 
         /// <param name="commandParameters">执行命令所用参数的集合</param> 
         /// <returns>用 Convert.To{Type}把类型转换为想要的 </returns> 
-        public static object ExecuteScalar(string SQLString)
+        public object ExecuteScalar(string SQLString)
         {
             /*
             MySqlCommand cmd = new MySqlCommand();
@@ -88,7 +108,7 @@ namespace SnnuWebService
         /// <param name="SQLString">sql语句</param>
         /// <param name="parameters">sql参数</param>
         /// <returns>（object类）查询结果</returns>
-        public static object ExecuteScalar(string SQLString, MySqlParameter[] parameters)
+        public object ExecuteScalar(string SQLString, MySqlParameter[] parameters)
         {
             using (MySqlConnection connection = new MySqlConnection(Conn))      //使用SQL string初始化connection
             {
@@ -119,7 +139,7 @@ namespace SnnuWebService
         /// </summary>
         /// <param name="sql">sql语句</param>
         /// <returns>影响的记录数</returns>
-        public static int ExecuteNonQuery(string sql)
+        public int ExecuteNonQuery(string sql)
         {
             using (MySqlConnection connection = new MySqlConnection(Conn))
             {
@@ -146,7 +166,7 @@ namespace SnnuWebService
         /// <param name="SQLString">sql语句</param>
         /// <param name="cmdParms"></param>
         /// <returns></returns>
-        public static int ExecuteNonQuery(string SQLString, params MySqlParameter[] cmdParms)
+        public int ExecuteNonQuery(string SQLString, params MySqlParameter[] cmdParms)
         {
             using (MySqlConnection connection = new MySqlConnection(Conn))
             {
@@ -173,7 +193,7 @@ namespace SnnuWebService
         /// </summary>
         /// <param name="SQLStringList">sql语句集</param>
         /// <returns>成功完成事务的数目</returns>
-        public static int ExecuteSqlTran(ArrayList SQLStringList)
+        public int ExecuteSqlTran(ArrayList SQLStringList)
         {
             using (MySqlConnection conn = new MySqlConnection(Conn))
             {
@@ -212,7 +232,7 @@ namespace SnnuWebService
         /// <param name="parameters"></param>
         /// <param name="TabName"></param>
         /// <returns></returns>
-        public static DataSet Query(string SQLString, MySqlParameter[] parameters, string TabName)
+        public DataSet Query(string SQLString, MySqlParameter[] parameters, string TabName)
         {
             using (MySqlConnection connection = new MySqlConnection(Conn))
             {
@@ -240,7 +260,7 @@ namespace SnnuWebService
         /// <param name="SQLString"></param>
         /// <param name="TabName"></param>
         /// <returns></returns>
-        public static DataSet Query(string SQLString, string TabName)
+        public DataSet Query(string SQLString, string TabName)
         {
             using (MySqlConnection connection = new MySqlConnection(Conn))
             {
@@ -266,7 +286,7 @@ namespace SnnuWebService
         /// <param name="SQLString"></param>
         /// <param name="cmdParms"></param>
         /// <returns></returns>
-        public static MySqlDataReader ExecuteReader(string SQLString, params MySqlParameter[] cmdParms)
+        public MySqlDataReader ExecuteReader(string SQLString, params MySqlParameter[] cmdParms)
         {
             MySqlConnection connection = new MySqlConnection(Conn);
             MySqlCommand cmd = new MySqlCommand(SQLString, connection);
@@ -288,7 +308,7 @@ namespace SnnuWebService
         /// </summary>
         /// <param name="SQLString"></param>
         /// <returns></returns>
-        public static MySqlDataReader ExecuteReader(string SQLString)
+        public MySqlDataReader ExecuteReader(string SQLString)
         {
             MySqlConnection connection = new MySqlConnection(Conn);
             MySqlCommand cmd = new MySqlCommand(SQLString, connection);
