@@ -87,6 +87,7 @@
   <ItemGroup>
     <Compile Include="DAL\Message.cs" />
     <Compile Include="Model\CardItem.cs" />
+    <Compile Include="Model\LibiaryItem.cs" />
     <Compile Include="Model\Message.cs" />
     <Compile Include="News.asmx.cs">
       <DependentUpon>News.asmx</DependentUpon>
