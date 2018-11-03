@@ -97,6 +97,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Spider\Spider.cs" />
+    <Compile Include="Spider\SpiderCard.cs" />
     <Compile Include="SqlHelper.cs" />
     <Compile Include="CampusCard.asmx.cs">
       <DependentUpon>CampusCard.asmx</DependentUpon>
