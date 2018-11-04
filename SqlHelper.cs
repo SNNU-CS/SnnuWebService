@@ -6,43 +6,55 @@ using System.Text;
 
 namespace SnnuWebService
 {
-    public class SqlHelper
+    /// <summary>  
+    /// SqlServer数据访问帮助类  
+    /// </summary>  
+    public sealed class SqlHelper
     {
-        //连接字符串
-        private string Conn;
 
+        #region 私有构造函数和方法结束  
+        private SqlHelper() { }
 
-        //私有构造函数
-        public SqlHelper(string Database , string DataSource , string UserId , string Password , string charset , bool pooling)
+        /// <summary>
+        /// 将MySqlParameter参数数组(参数值)分配给MySqlCommand命令.  
+        /// 这个方法将给任何一个参数分配DBNull.Value;  
+        /// 该操作将阻止默认值的使用. 
+        /// </summary>
+        /// <param name="command">命令名</param>
+        /// <param name="commandParameters">MySqlParameters数组</param>
+        private static void AttachParameters(MySqlCommand command, MySqlParameter[] commandParameters)
         {
-            StringBuilder str = new StringBuilder();
-            str.Append("Database='" + Database + "';");
-            str.Append("DataSource='" + DataSource + "';");
-            str.Append("User Id='" + UserId + "';");
-            str.Append("Password='" + Password + "';");
-            str.Append("charset='" + charset + "';");
-            if (pooling)
+            if (command == null) throw new ArgumentNullException("command");
+            if (commandParameters != null)
             {
-                str.Append("Pooling='true';");
+                foreach (MySqlParameter p in commandParameters)
+                {
+                    if (p != null)
+                    {
+                        // 检查未分配值的输出参数,将其分配以DBNull.Value.  
+                        if ((p.Direction == ParameterDirection.InputOutput || p.Direction == ParameterDirection.Input) &&
+                            (p.Value == null))
+                        {
+                            p.Value = DBNull.Value;
+                        }
+                        command.Parameters.Add(p);
+                    }
+                }
             }
-            else
-                str.Append("Pooling='false'");
-            Conn = str.ToString();
-        }
-        public SqlHelper(string Conn)
-        {
-            this.Conn = Conn;
         }
 
         /// <summary> 
-        /// 准备执行一个命令 
+        /// 预处理用户提供的命令,数据库连接/命令类型/参数  
         /// </summary> 
-        /// <param name="cmd">sql命令</param> 
-        /// <param name="conn">OleDb连接</param> 
-        /// <param name="cmdText">命令文本,例如:Select * from Products</param> 
-        /// <param name="cmdParms">执行命令的参数</param> 
-        private static void PrepareCommand(MySqlCommand cmd, MySqlConnection conn, string cmdText, MySqlParameter[] cmdParms)
+        /// <param name="cmd">要处理的MySqlCommand</param> 
+        /// <param name="conn">数据库连接<</param> 
+        /// <param name="commandType">命令类型 (存储过程,命令文本, 其它.)</param>
+        /// <param name="cmdText">存储过程名或都T-SQL命令文本</param> 
+        /// <param name="cmdParms">和命令相关联的MySqlParameter参数数组,如果没有参数为’null’</param> 
+        private static void PrepareCommand(MySqlCommand cmd, MySqlConnection conn, CommandType commandType, string cmdText, MySqlParameter[] cmdParms)
         {
+            if (cmd == null) throw new ArgumentNullException("command");
+            if (cmdText == null || cmdText.Length == 0) throw new ArgumentNullException("commandText");
             if (conn.State != ConnectionState.Open)
                 conn.Open();
 
@@ -51,277 +63,398 @@ namespace SnnuWebService
 
             if (cmdParms != null)
             {
+                AttachParameters(cmd, cmdParms);
+            }
+            return;
+        }
+        #endregion
 
-                foreach (MySqlParameter parm in cmdParms)
-                    cmd.Parameters.Add(parm);
+        #region  ExecuteNonQuery命令
+        /// <summary>  
+        /// 执行指定连接字符串,类型的MySqlCommand.  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  int result = ExecuteNonQuery(connString, CommandType.StoredProcedure, "PublishOrders");  
+        /// </remarks>  
+        /// <param name="connectionString">一个有效的数据库连接字符串</param>
+        /// <param name="commandType">命令类型 (存储过程,命令文本, 其它.)</param>
+        /// <param name="commandText">存储过程名称或SQL语句</param>
+        /// <returns>返回命令影响的行数</returns> 
+        public static int ExecuteNonQuery(string connectionString, CommandType commandType, string commandText)
+        {
+            return ExecuteNonQuery(connectionString, commandType, commandText, (MySqlParameter[])null);
+        }
+
+        /// <summary>  
+        /// 执行指定连接字符串,类型的MySqlCommand.如果没有提供参数,不返回结果.  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  int result = ExecuteNonQuery(connString, CommandType.StoredProcedure, "PublishOrders", new SqlParameter("@prodid", 24));  
+        /// </remarks>
+        /// <param name="connectionString">一个有效的数据库连接字符串</param>
+        /// <param name="commandType">命令类型 (存储过程,命令文本, 其它.)</param>
+        /// <param name="commandText">存储过程名称或SQL语句</param>
+        /// <param name="commandParameters">MySqlParameter参数数组</param>
+        /// <returns>返回命令影响的行数</returns>  
+        public static int ExecuteNonQuery(string connectionString, CommandType commandType, string commandText, params MySqlParameter[] commandParameters)
+        {
+            if (connectionString == null || connectionString.Length == 0) throw new ArgumentNullException("connectionString");
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                return ExecuteNonQuery(connection, commandType, commandText, commandParameters);
             }
         }
 
-
-        /// <summary> 
-        /// 用指定的数据库连接执行一个命令并返回一个数据集的第一列 
-        /// </summary> 
-        /// <remarks> 
-        /// 例如: 
-        /// Object obj = ExecuteScalar(connString, CommandType.StoredProcedure, "PublishOrders", new MySqlParameter("@prodid", 24)); 
-        /// </remarks> 
-        /// <param name="connection">一个存在的数据库连接</param> 
-        /// <param name="cmdType">命令类型(存储过程, 文本, 等等)</param> 
-        /// <param name="cmdText">存储过程名称或者sql命令语句</param> 
-        /// <param name="commandParameters">执行命令所用参数的集合</param> 
-        /// <returns>用 Convert.To{Type}把类型转换为想要的 </returns> 
-        public object ExecuteScalar(string SQLString)
+        /// <summary>  
+        /// 执行指定数据库连接对象的命令   
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  int result = ExecuteNonQuery(conn, CommandType.StoredProcedure, "PublishOrders");  
+        /// </remarks>  
+        /// <param name="connectionString">一个有效的数据库连接字符串</param>
+        /// <param name="commandType">命令类型 (存储过程,命令文本, 其它.)</param>
+        /// <param name="commandText">存储过程名称或SQL语句</param>
+        /// <returns>返回影响的行数</returns>  
+        public static int ExecuteNonQuery(MySqlConnection connection, CommandType commandType, string commandText)
         {
-            /*
+            return ExecuteNonQuery(connection, commandType, commandText, (MySqlParameter[])null);
+        }
+
+        /// <summary>  
+        /// 执行指定数据库连接对象的命令  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  int result = ExecuteNonQuery(conn, CommandType.StoredProcedure, "PublishOrders", new SqlParameter("@prodid", 24));  
+        /// </remarks>  
+        /// <param name="connectionString">一个有效的数据库连接字符串</param>
+        /// <param name="commandType">命令类型 (存储过程,命令文本, 其它.)</param>
+        /// <param name="commandText">存储过程名称或SQL语句</param>
+        /// <param name="commandParameters">MySqlParameter参数数组</param>
+        /// <returns>返回影响的行数</returns>  
+        public static int ExecuteNonQuery(MySqlConnection connection, CommandType commandType, string commandText, params MySqlParameter[] commandParameters)
+        {
+            if (connection == null) throw new ArgumentNullException("connection");
+            // 创建SqlCommand命令,并进行预处理  
             MySqlCommand cmd = new MySqlCommand();
+            bool mustCloseConnection = false;
+            PrepareCommand(cmd, connection,  commandType, commandText, commandParameters);
 
-            PrepareCommand(cmd, connection, cmdText, commandParameters);
-            object val = cmd.ExecuteScalar();
+            // Finally, execute the command  
+            int retval = cmd.ExecuteNonQuery();
+
+            // 清除参数,以便再次使用.  
             cmd.Parameters.Clear();
-            return val;
-            */
-            using (MySqlConnection connection = new MySqlConnection(Conn))
+            if (mustCloseConnection)
+                connection.Close();
+            return retval;
+        }
+        #endregion
+
+        #region 返回结果集中的第一行第一列
+        /// <summary>  
+        /// 执行指定数据库连接字符串的命令,返回结果集中的第一行第一列.  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  int orderCount = (int)ExecuteScalar(connString, CommandType.StoredProcedure, "GetOrderCount");  
+        /// </remarks>  
+        /// <param name="connectionString">一个有效的数据库连接字符串</param>  
+        /// <param name="commandType"> 命令类型 (存储过程,命令文本或其它)</param>  
+        /// <param name="commandText"param>存储过程名称或T-SQL语句</param>  
+        /// <returns>返回结果集中的第一行第一列</returns>  
+        public static object ExecuteScalar(string connectionString, CommandType commandType, string commandText)
+        {
+            // 执行参数为空的方法  
+            return ExecuteScalar(connectionString, commandType, commandText, (MySqlParameter[])null);
+        }
+
+        /// <summary>  
+        /// 执行指定数据库连接字符串的命令,指定参数,返回结果集中的第一行第一列.  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  int orderCount = (int)ExecuteScalar(connString, CommandType.StoredProcedure, "GetOrderCount", new SqlParameter("@prodid", 24));  
+        /// </remarks>  
+        /// <param name="connectionString">一个有效的数据库连接字符串</param>  
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>  
+        /// <param name="commandText">存储过程名称或T-SQL语句</param>  
+        /// <param name="commandParameters">分配给命令的SqlParamter参数数组</param>  
+        /// <returns>返回结果集中的第一行第一列</returns>  
+        public static object ExecuteScalar(string connectionString, CommandType commandType, string commandText, params MySqlParameter[] commandParameters)
+        {
+            if (connectionString == null || connectionString.Length == 0) throw new ArgumentNullException("connectionString");
+            // 创建并打开数据库连接对象,操作完成释放对象.  
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                using (MySqlCommand mySqlCommand = new MySqlCommand(SQLString, connection))
-                {
-                    try
-                    {
-                        connection.Open();
-                        object obj = mySqlCommand.ExecuteScalar();       //执行查询，并返回结果的第一行，其余结果将被忽略
-                        if ((Object.Equals(obj, null)) || (Object.Equals(obj, System.DBNull.Value)))
-                            return null;
-                        else
-                            return obj;
-                    }
-                    catch (Exception e)
-                    {
-                        connection.Close();
-                    }
-                }
-                return null;
+                connection.Open();
+                // 调用指定数据库连接字符串重载方法.  
+                return ExecuteScalar(connection, commandType, commandText, commandParameters);
             }
         }
 
-        /// <summary>
-        /// 执行查询语句（重载）
-        /// </summary>
-        /// <param name="SQLString">sql语句</param>
-        /// <param name="parameters">sql参数</param>
-        /// <returns>（object类）查询结果</returns>
-        public object ExecuteScalar(string SQLString, MySqlParameter[] parameters)
+        /// <summary>  
+        /// 执行指定数据库连接对象的命令,返回结果集中的第一行第一列.  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  int orderCount = (int)ExecuteScalar(conn, CommandType.StoredProcedure, "GetOrderCount");  
+        /// </remarks>  
+        /// <param name="connection">一个有效的数据库连接对象</param>  
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>  
+        /// <param name="commandText">存储过程名称或T-SQL语句</param>  
+        /// <returns>返回结果集中的第一行第一列</returns> 
+        public static object ExecuteScalar(MySqlConnection connection, CommandType commandType, string commandText)
         {
-            using (MySqlConnection connection = new MySqlConnection(Conn))      //使用SQL string初始化connection
-            {
-                using (MySqlCommand cmd = new MySqlCommand(SQLString, connection))          //使用cmdText和connection初始化cmd
-                {
-                    try
-                    {
-                        connection.Open();
-                        PrepareCommand(cmd, connection, SQLString, parameters);
-                        object obj = cmd.ExecuteScalar();
-                        if ((Object.Equals(obj, null)) || (Object.Equals(obj, System.DBNull.Value)))
-                            return null;
-                        else
-                            return obj;
-                    }
-                    catch (Exception e)
-                    {
-                        connection.Close();
-                    }
-                }
-            }
-            return null;
+            // 执行参数为空的方法  
+            return ExecuteScalar(connection, commandType, commandText, (MySqlParameter[])null);
         }
 
-
-        /// <summary>
-        /// 查看查询语句影响的记录数
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>影响的记录数</returns>
-        public int ExecuteNonQuery(string sql)
+        /// <summary>  
+        /// 执行指定数据库连接对象的命令,指定参数,返回结果集中的第一行第一列.  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  int orderCount = (int)ExecuteScalar(conn, CommandType.StoredProcedure, "GetOrderCount", new SqlParameter("@prodid", 24));  
+        /// </remarks>  
+        /// <param name="connection">一个有效的数据库连接对象</param>  
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>  
+        /// <param name="commandText">存储过程名称或T-SQL语句</param>  
+        /// <param name="commandParameters">分配给命令的MySqlParamter参数数组</param>  
+        /// <returns>返回结果集中的第一行第一列</returns>  
+        public static object ExecuteScalar(MySqlConnection connection, CommandType commandType, string commandText, params MySqlParameter[] commandParameters)
         {
-            using (MySqlConnection connection = new MySqlConnection(Conn))
-            {
-                using (MySqlCommand cmd = new MySqlCommand(sql, connection))
-                {
-                    try
-                    {
-                        connection.Open();
-                        int n = cmd.ExecuteNonQuery();
-                        return n;
-                    }
-                    catch (Exception e)
-                    {
-                        connection.Close();
-                    }
-                }
-            }
-            return 0;
+            if (connection == null) throw new ArgumentNullException("connection");
+            // 创建SqlCommand命令,并进行预处理  
+            MySqlCommand cmd = new MySqlCommand();
+            bool mustCloseConnection = false;
+            PrepareCommand(cmd, connection, commandType, commandText, commandParameters);
+
+            // 执行SqlCommand命令,并返回结果.  
+            object retval = cmd.ExecuteScalar();
+
+            // 清除参数,以便再次使用.  
+            cmd.Parameters.Clear();
+            if (mustCloseConnection)
+                connection.Close();
+            return retval;
         }
+        #endregion 返回结果集中的第一行第一列    
 
-        /// <summary>
-        /// 查看查询语句影响的记录数
-        /// </summary>
-        /// <param name="SQLString">sql语句</param>
-        /// <param name="cmdParms"></param>
-        /// <returns></returns>
-        public int ExecuteNonQuery(string SQLString, params MySqlParameter[] cmdParms)
+        #region ExecuteReader 数据阅读器
+        /// <summary>  
+        /// 枚举,标识数据库连接是由SqlHelper提供还是由调用者提供  
+        /// </summary> 
+        private enum SqlConnectionOwnership
         {
-            using (MySqlConnection connection = new MySqlConnection(Conn))
-            {
-                using (MySqlCommand cmd = new MySqlCommand(SQLString, connection))
-                {
-                    try
-                    {
-                        PrepareCommand(cmd, connection, SQLString, cmdParms);
-                        object n = cmd.ExecuteNonQuery();
-                        cmd.Parameters.Clear();
-                        return Convert.ToInt32(n);
-                    }
-                    catch (Exception e)
-                    {
-                    }
-                    return 0;
-                }
-            }
+            /// <summary>由SqlHelper提供连接</summary>  
+            Internal,
+            /// <summary>由调用者提供连接</summary>  
+            External
         }
-
-
-        /// <summary>
-        /// 执行事务
-        /// </summary>
-        /// <param name="SQLStringList">sql语句集</param>
-        /// <returns>成功完成事务的数目</returns>
-        public int ExecuteSqlTran(ArrayList SQLStringList)
+        /// <summary>  
+        /// 执行指定数据库连接对象的数据阅读器.  
+        /// </summary>  
+        /// <remarks>  
+        /// 如果是SqlHelper打开连接,当连接关闭DataReader也将关闭.  
+        /// 如果是调用都打开连接,DataReader由调用都管理.  
+        /// </remarks>  
+        /// <param name="connection">一个有效的数据库连接对象</param>  
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>  
+        /// <param name="commandText">存储过程名或T-SQL语句</param>  
+        /// <param name="commandParameters">MySqlParameters参数数组,如果没有参数则为’null’</param>  
+        /// <param name="connectionOwnership">标识数据库连接对象是由调用者提供还是由SqlHelper提供</param>  
+        /// <returns>返回包含结果集的MySqlDataReader</returns>  
+        private static MySqlDataReader ExecuteReader(MySqlConnection connection,CommandType commandType, string commandText, MySqlParameter[] commandParameters, SqlConnectionOwnership connectionOwnership)
         {
-            using (MySqlConnection conn = new MySqlConnection(Conn))
+            if (connection == null) throw new ArgumentNullException("connection");
+            bool mustCloseConnection = false;
+            // 创建命令  
+            MySqlCommand cmd = new MySqlCommand();
+            try
             {
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
-                MySqlTransaction tx = conn.BeginTransaction();      //开始事务
-                cmd.Transaction = tx;
-                int count = 0;
-                try
+                PrepareCommand(cmd, connection,commandType, commandText, commandParameters);
+
+                // 创建数据阅读器  
+                MySqlDataReader dataReader;
+                if (connectionOwnership == SqlConnectionOwnership.External)
                 {
-                    for (int n = 0; n < SQLStringList.Count; n++)
-                    {
-                        string strsql = SQLStringList[n].ToString();
-                        if (strsql.Trim().Length > 1)
-                        {
-                            cmd.CommandText = strsql;
-                            count += cmd.ExecuteNonQuery();
-                        }
-                    }
-                    tx.Commit();        //提交事务
+                    dataReader = cmd.ExecuteReader();
                 }
-                catch (Exception e)
+                else
                 {
-                    tx.Rollback();      //回滚事务
+                    dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
                 }
-                return count;
+
+                // 清除参数,以便再次使用..  
+                // HACK: There is a problem here, the output parameter values are fletched   
+                // when the reader is closed, so if the parameters are detached from the command  
+                // then the SqlReader can磘 set its values.   
+                // When this happen, the parameters can磘 be used again in other command.  
+                bool canClear = true;
+                foreach (MySqlParameter commandParameter in cmd.Parameters)
+                {
+                    if (commandParameter.Direction != ParameterDirection.Input)
+                        canClear = false;
+                }
+
+                if (canClear)
+                {
+                    cmd.Parameters.Clear();
+                }
+                return dataReader;
+            }
+            catch
+            {
+                if (mustCloseConnection)
+                    connection.Close();
+                throw;
             }
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="SQLString"></param>
-        /// <param name="parameters"></param>
-        /// <param name="TabName"></param>
-        /// <returns></returns>
-        public DataSet Query(string SQLString, MySqlParameter[] parameters, string TabName)
+        /// <summary>  
+        /// 执行指定数据库连接字符串的数据阅读器.  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  SqlDataReader dr = ExecuteReader(connString, CommandType.StoredProcedure, "GetOrders");  
+        /// </remarks>  
+        /// <param name="connectionString">一个有效的数据库连接字符串</param>  
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>  
+        /// <param name="commandText">存储过程名或T-SQL语句</param>  
+        /// <returns>返回包含结果集的MySqlDataReader</returns>  
+        public static MySqlDataReader ExecuteReader(string connectionString, CommandType commandType, string commandText)
         {
-            using (MySqlConnection connection = new MySqlConnection(Conn))
+            return ExecuteReader(connectionString, commandType, commandText, (MySqlParameter[])null);
+        }
+
+        /// <summary>  
+        /// 执行指定数据库连接字符串的数据阅读器,指定参数.  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  SqlDataReader dr = ExecuteReader(connString, CommandType.StoredProcedure, "GetOrders", new SqlParameter("@prodid", 24));  
+        /// </remarks>  
+        /// <param name="connectionString">一个有效的数据库连接字符串</param>  
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>  
+        /// <param name="commandText">存储过程名或T-SQL语句</param>  
+        /// <param name="commandParameters">MySqlParamter参数数组(new SqlParameter("@prodid", 24))</param>  
+        /// <returns>返回包含结果集的MySqlDataReader</returns>  
+        public static MySqlDataReader ExecuteReader(string connectionString, CommandType commandType, string commandText, params MySqlParameter[] commandParameters)
+        {
+            if (connectionString == null || connectionString.Length == 0) throw new ArgumentNullException("connectionString");
+            MySqlConnection connection = null;
+            try
             {
-                MySqlCommand cmd = new MySqlCommand();
-                PrepareCommand(cmd, connection, SQLString, parameters);
-                using (MySqlDataAdapter da = new MySqlDataAdapter(cmd))     //一组数据命令和一个数据库连接
-                {
-                    DataSet ds = new DataSet();
-                    try
-                    {
-                        da.Fill(ds, TabName);
-                        cmd.Parameters.Clear();
-                    }
-                    catch (Exception e)
-                    {
-                    }
-                    return ds;
-                }
+                connection = new MySqlConnection(connectionString);
+                connection.Open();
+                return ExecuteReader(connection, commandType, commandText, commandParameters, SqlConnectionOwnership.Internal);
+            }
+            catch
+            {
+                // If we fail to return the SqlDatReader, we need to close the connection ourselves  
+                if (connection != null) connection.Close();
+                throw;
+            }
+
+        }
+        #endregion
+
+        #region ExecuteDataset方法
+        /// <summary>  
+        /// 执行指定数据库连接字符串的命令,返回DataSet.  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  DataSet ds = ExecuteDataset(connString, CommandType.StoredProcedure, "GetOrders");  
+        /// </remarks>  
+        /// <param name="connectionString">一个有效的数据库连接字符串</param>  
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>  
+        /// <param name="commandText">存储过程名称或T-SQL语句</param>  
+        /// <returns>返回一个包含结果集的DataSet</returns>  
+        public static DataSet ExecuteDataset(string connectionString, CommandType commandType, string commandText)
+        {
+            return ExecuteDataset(connectionString, commandType, commandText, (MySqlParameter[])null);
+        }
+
+        /// <summary>  
+        /// 执行指定数据库连接字符串的命令,返回DataSet.  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:   
+        ///  DataSet ds = ExecuteDataset(connString, CommandType.StoredProcedure, "GetOrders", new SqlParameter("@prodid", 24));  
+        /// </remarks>  
+        /// <param name="connectionString">一个有效的数据库连接字符串</param>  
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>  
+        /// <param name="commandText">存储过程名称或T-SQL语句</param>  
+        /// <param name="commandParameters">MySqlParamters参数数组</param>  
+        /// <returns>返回一个包含结果集的DataSet</returns>  
+        public static DataSet ExecuteDataset(string connectionString, CommandType commandType, string commandText, params MySqlParameter[] commandParameters)
+        {
+            if (connectionString == null || connectionString.Length == 0) throw new ArgumentNullException("connectionString");
+            // 创建并打开数据库连接对象,操作完成释放对象.  
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                // 调用指定数据库连接字符串重载方法.  
+                return ExecuteDataset(connection, commandType, commandText, commandParameters);
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="SQLString"></param>
-        /// <param name="TabName"></param>
-        /// <returns></returns>
-        public DataSet Query(string SQLString, string TabName)
+        /// <summary>  
+        /// 执行指定数据库连接对象的命令,返回DataSet.  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  DataSet ds = ExecuteDataset(conn, CommandType.StoredProcedure, "GetOrders");  
+        /// </remarks>  
+        /// <param name="connection">一个有效的数据库连接对象</param>  
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>  
+        /// <param name="commandText">存储过程名或T-SQL语句</param>  
+        /// <returns>返回一个包含结果集的DataSet</returns>  
+        public static DataSet ExecuteDataset(MySqlConnection connection, CommandType commandType, string commandText)
         {
-            using (MySqlConnection connection = new MySqlConnection(Conn))
+            return ExecuteDataset(connection, commandType, commandText, (MySqlParameter[])null);
+        }
+
+        /// <summary>  
+        /// 执行指定数据库连接对象的命令,指定存储过程参数,返回DataSet.  
+        /// </summary>  
+        /// <remarks>  
+        /// 示例:    
+        ///  DataSet ds = ExecuteDataset(conn, CommandType.StoredProcedure, "GetOrders", new MySqlParameter("@prodid", 24));  
+        /// </remarks>  
+        /// <param name="connection">一个有效的数据库连接对象</param>  
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>  
+        /// <param name="commandText">存储过程名或T-SQL语句</param>  
+        /// <param name="commandParameters">MySqlParamter参数数组</param>  
+        /// <returns>返回一个包含结果集的DataSet</returns>  
+        public static DataSet ExecuteDataset(MySqlConnection connection, CommandType commandType, string commandText, params MySqlParameter[] commandParameters)
+        {
+            if (connection == null) throw new ArgumentNullException("connection");
+            // 预处理  
+            MySqlCommand cmd = new MySqlCommand();
+            bool mustCloseConnection = false;
+            PrepareCommand(cmd, connection,commandType, commandText, commandParameters);
+
+            // 创建SqlDataAdapter和DataSet.  
+            using (MySqlDataAdapter da = new MySqlDataAdapter(cmd))
             {
                 DataSet ds = new DataSet();
-                try
-                {
-                    connection.Open();
-                    MySqlDataAdapter command = new MySqlDataAdapter(SQLString, connection);
-                    command.Fill(ds, TabName);
+                // 填充DataSet.  
+                da.Fill(ds);
+
+                cmd.Parameters.Clear();
+                if (mustCloseConnection)
                     connection.Close();
-                }
-                catch (Exception e)
-                {
-                }
                 return ds;
             }
         }
+        #endregion
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="SQLString"></param>
-        /// <param name="cmdParms"></param>
-        /// <returns></returns>
-        public MySqlDataReader ExecuteReader(string SQLString, params MySqlParameter[] cmdParms)
-        {
-            MySqlConnection connection = new MySqlConnection(Conn);
-            MySqlCommand cmd = new MySqlCommand(SQLString, connection);
-            try
-            {
-                PrepareCommand(cmd, connection, SQLString, cmdParms);
-                MySqlDataReader myReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-                cmd.Parameters.Clear();
-                return myReader;
-            }
-            catch (Exception e)
-            {
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="SQLString"></param>
-        /// <returns></returns>
-        public MySqlDataReader ExecuteReader(string SQLString)
-        {
-            MySqlConnection connection = new MySqlConnection(Conn);
-            MySqlCommand cmd = new MySqlCommand(SQLString, connection);
-            try
-            {
-                connection.Open();
-                MySqlDataReader myReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-                return myReader;
-            }
-            catch (Exception e)
-            {
-            }
-            return null;
-        }
     }
 }
