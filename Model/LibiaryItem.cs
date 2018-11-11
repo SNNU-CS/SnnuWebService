@@ -12,7 +12,7 @@ namespace SnnuWebService.Model
         private string author;
         private DateTime deadline=DateTime.MinValue;
         private string branch;
-        private string Location;
+        private string location;
 
         public string Name
         {
@@ -79,16 +79,16 @@ namespace SnnuWebService.Model
             }
         }
 
-        public string Location1
+        public string Location
         {
             get
             {
-                return Location;
+                return location;
             }
 
             set
             {
-                Location = value;
+                location = value;
             }
         }
     }
