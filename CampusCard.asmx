@@ -1,1 +1,1 @@
-﻿<%@ WebService Language="C#" CodeBehind="CampusCard.asmx.cs" Class="SnnuWebService.WebService1" %>
+﻿<%@ WebService Language="C#" CodeBehind="CampusCard.asmx.cs" Class="SnnuWebService.CampusCard" %>
