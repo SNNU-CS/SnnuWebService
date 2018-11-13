@@ -33,6 +33,7 @@ namespace SnnuWebService
                 t.Author = dic["著者"].ToString();
                 t.Location = dic["取书地点"].ToString();
                 t.Branch = dic["单册分馆"].ToString();
+                t.Book = dic["书名"].ToString();
                 t.Deadline = DateTime.Parse(dic["保留结束日期"].ToString());
                 ret.Add(t);
             }
