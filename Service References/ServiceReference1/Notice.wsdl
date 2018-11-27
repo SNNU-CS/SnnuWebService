@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://webxml.zhaoqi.vip/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://webxml.zhaoqi.vip/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://webxml.zhaoqi.vip/">
+      <s:element name="getSupportDep">
+        <s:complexType />
+      </s:element>
+      <s:element name="getSupportDepResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getSupportDepResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="getNoticeByDepartment">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="dep" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getNoticeByDepartmentResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getNoticeByDepartmentResult" type="tns:ArrayOfMessage" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfMessage">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Message" nillable="true" type="tns:Message" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Message">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Title" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Link" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Date" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="Type" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Department" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="getNoticeByDate">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="date" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getNoticeByDateResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getNoticeByDateResult" type="tns:ArrayOfMessage" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getNoticeByDepartmentAndDate">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="dep" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="date" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getNoticeByDepartmentAndDateResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getNoticeByDepartmentAndDateResult" type="tns:ArrayOfMessage" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getNoticeByLikeTitle">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="keyword" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getNoticeByLikeTitleResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getNoticeByLikeTitleResult" type="tns:ArrayOfMessage" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ArrayOfString" nillable="true" type="tns:ArrayOfString" />
+      <s:element name="ArrayOfMessage" nillable="true" type="tns:ArrayOfMessage" />
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="getSupportDepSoapIn">
+    <wsdl:part name="parameters" element="tns:getSupportDep" />
+  </wsdl:message>
+  <wsdl:message name="getSupportDepSoapOut">
+    <wsdl:part name="parameters" element="tns:getSupportDepResponse" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDepartmentSoapIn">
+    <wsdl:part name="parameters" element="tns:getNoticeByDepartment" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDepartmentSoapOut">
+    <wsdl:part name="parameters" element="tns:getNoticeByDepartmentResponse" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDateSoapIn">
+    <wsdl:part name="parameters" element="tns:getNoticeByDate" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDateSoapOut">
+    <wsdl:part name="parameters" element="tns:getNoticeByDateResponse" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDepartmentAndDateSoapIn">
+    <wsdl:part name="parameters" element="tns:getNoticeByDepartmentAndDate" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDepartmentAndDateSoapOut">
+    <wsdl:part name="parameters" element="tns:getNoticeByDepartmentAndDateResponse" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByLikeTitleSoapIn">
+    <wsdl:part name="parameters" element="tns:getNoticeByLikeTitle" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByLikeTitleSoapOut">
+    <wsdl:part name="parameters" element="tns:getNoticeByLikeTitleResponse" />
+  </wsdl:message>
+  <wsdl:message name="getSupportDepHttpGetIn" />
+  <wsdl:message name="getSupportDepHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDepartmentHttpGetIn">
+    <wsdl:part name="dep" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDepartmentHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMessage" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDateHttpGetIn">
+    <wsdl:part name="date" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDateHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMessage" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDepartmentAndDateHttpGetIn">
+    <wsdl:part name="dep" type="s:string" />
+    <wsdl:part name="date" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDepartmentAndDateHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMessage" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByLikeTitleHttpGetIn">
+    <wsdl:part name="keyword" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByLikeTitleHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMessage" />
+  </wsdl:message>
+  <wsdl:message name="getSupportDepHttpPostIn" />
+  <wsdl:message name="getSupportDepHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDepartmentHttpPostIn">
+    <wsdl:part name="dep" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDepartmentHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMessage" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDateHttpPostIn">
+    <wsdl:part name="date" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDateHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMessage" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDepartmentAndDateHttpPostIn">
+    <wsdl:part name="dep" type="s:string" />
+    <wsdl:part name="date" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByDepartmentAndDateHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMessage" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByLikeTitleHttpPostIn">
+    <wsdl:part name="keyword" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getNoticeByLikeTitleHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMessage" />
+  </wsdl:message>
+  <wsdl:portType name="NoticeSoap">
+    <wsdl:operation name="getSupportDep">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">所支持查询的部门</wsdl:documentation>
+      <wsdl:input message="tns:getSupportDepSoapIn" />
+      <wsdl:output message="tns:getSupportDepSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartment">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询某个部门最近两周内的通知</wsdl:documentation>
+      <wsdl:input message="tns:getNoticeByDepartmentSoapIn" />
+      <wsdl:output message="tns:getNoticeByDepartmentSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDate">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询以某个日期为准前后一周的通知</wsdl:documentation>
+      <wsdl:input message="tns:getNoticeByDateSoapIn" />
+      <wsdl:output message="tns:getNoticeByDateSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartmentAndDate">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询某个部门的某个日期前后一周的通知</wsdl:documentation>
+      <wsdl:input message="tns:getNoticeByDepartmentAndDateSoapIn" />
+      <wsdl:output message="tns:getNoticeByDepartmentAndDateSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByLikeTitle">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">通过标题查询通知(模糊查询)</wsdl:documentation>
+      <wsdl:input message="tns:getNoticeByLikeTitleSoapIn" />
+      <wsdl:output message="tns:getNoticeByLikeTitleSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="NoticeHttpGet">
+    <wsdl:operation name="getSupportDep">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">所支持查询的部门</wsdl:documentation>
+      <wsdl:input message="tns:getSupportDepHttpGetIn" />
+      <wsdl:output message="tns:getSupportDepHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartment">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询某个部门最近两周内的通知</wsdl:documentation>
+      <wsdl:input message="tns:getNoticeByDepartmentHttpGetIn" />
+      <wsdl:output message="tns:getNoticeByDepartmentHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDate">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询以某个日期为准前后一周的通知</wsdl:documentation>
+      <wsdl:input message="tns:getNoticeByDateHttpGetIn" />
+      <wsdl:output message="tns:getNoticeByDateHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartmentAndDate">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询某个部门的某个日期前后一周的通知</wsdl:documentation>
+      <wsdl:input message="tns:getNoticeByDepartmentAndDateHttpGetIn" />
+      <wsdl:output message="tns:getNoticeByDepartmentAndDateHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByLikeTitle">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">通过标题查询通知(模糊查询)</wsdl:documentation>
+      <wsdl:input message="tns:getNoticeByLikeTitleHttpGetIn" />
+      <wsdl:output message="tns:getNoticeByLikeTitleHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="NoticeHttpPost">
+    <wsdl:operation name="getSupportDep">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">所支持查询的部门</wsdl:documentation>
+      <wsdl:input message="tns:getSupportDepHttpPostIn" />
+      <wsdl:output message="tns:getSupportDepHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartment">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询某个部门最近两周内的通知</wsdl:documentation>
+      <wsdl:input message="tns:getNoticeByDepartmentHttpPostIn" />
+      <wsdl:output message="tns:getNoticeByDepartmentHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDate">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询以某个日期为准前后一周的通知</wsdl:documentation>
+      <wsdl:input message="tns:getNoticeByDateHttpPostIn" />
+      <wsdl:output message="tns:getNoticeByDateHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartmentAndDate">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询某个部门的某个日期前后一周的通知</wsdl:documentation>
+      <wsdl:input message="tns:getNoticeByDepartmentAndDateHttpPostIn" />
+      <wsdl:output message="tns:getNoticeByDepartmentAndDateHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByLikeTitle">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">通过标题查询通知(模糊查询)</wsdl:documentation>
+      <wsdl:input message="tns:getNoticeByLikeTitleHttpPostIn" />
+      <wsdl:output message="tns:getNoticeByLikeTitleHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="NoticeSoap" type="tns:NoticeSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="getSupportDep">
+      <soap:operation soapAction="http://webxml.zhaoqi.vip/getSupportDep" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartment">
+      <soap:operation soapAction="http://webxml.zhaoqi.vip/getNoticeByDepartment" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDate">
+      <soap:operation soapAction="http://webxml.zhaoqi.vip/getNoticeByDate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartmentAndDate">
+      <soap:operation soapAction="http://webxml.zhaoqi.vip/getNoticeByDepartmentAndDate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByLikeTitle">
+      <soap:operation soapAction="http://webxml.zhaoqi.vip/getNoticeByLikeTitle" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="NoticeSoap12" type="tns:NoticeSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="getSupportDep">
+      <soap12:operation soapAction="http://webxml.zhaoqi.vip/getSupportDep" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartment">
+      <soap12:operation soapAction="http://webxml.zhaoqi.vip/getNoticeByDepartment" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDate">
+      <soap12:operation soapAction="http://webxml.zhaoqi.vip/getNoticeByDate" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartmentAndDate">
+      <soap12:operation soapAction="http://webxml.zhaoqi.vip/getNoticeByDepartmentAndDate" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByLikeTitle">
+      <soap12:operation soapAction="http://webxml.zhaoqi.vip/getNoticeByLikeTitle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="NoticeHttpGet" type="tns:NoticeHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="getSupportDep">
+      <http:operation location="/getSupportDep" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartment">
+      <http:operation location="/getNoticeByDepartment" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDate">
+      <http:operation location="/getNoticeByDate" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartmentAndDate">
+      <http:operation location="/getNoticeByDepartmentAndDate" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByLikeTitle">
+      <http:operation location="/getNoticeByLikeTitle" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="NoticeHttpPost" type="tns:NoticeHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="getSupportDep">
+      <http:operation location="/getSupportDep" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartment">
+      <http:operation location="/getNoticeByDepartment" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDate">
+      <http:operation location="/getNoticeByDate" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByDepartmentAndDate">
+      <http:operation location="/getNoticeByDepartmentAndDate" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNoticeByLikeTitle">
+      <http:operation location="/getNoticeByLikeTitle" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Notice">
+    <wsdl:port name="NoticeSoap" binding="tns:NoticeSoap">
+      <soap:address location="http://webxml.zhaoqi.vip/Notice.asmx" />
+    </wsdl:port>
+    <wsdl:port name="NoticeSoap12" binding="tns:NoticeSoap12">
+      <soap12:address location="http://webxml.zhaoqi.vip/Notice.asmx" />
+    </wsdl:port>
+    <wsdl:port name="NoticeHttpGet" binding="tns:NoticeHttpGet">
+      <http:address location="http://webxml.zhaoqi.vip/Notice.asmx" />
+    </wsdl:port>
+    <wsdl:port name="NoticeHttpPost" binding="tns:NoticeHttpPost">
+      <http:address location="http://webxml.zhaoqi.vip/Notice.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
