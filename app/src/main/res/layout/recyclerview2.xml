@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="120dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:id="@+id/txt_Location"
+        android:layout_marginStart="20dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
+        android:textColor="#000"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:id="@+id/txt_Frequency"
+        android:layout_alignBaseline="@+id/txt_Date2"
+        android:layout_alignBottom="@+id/txt_Date2"
+        android:layout_alignStart="@+id/txt_Location"
+        android:textSize="15sp"
+        android:textColor="#000"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:id="@+id/txt_TransAmount"
+        android:layout_alignBaseline="@+id/txt_Location"
+        android:layout_alignBottom="@+id/txt_Location"
+        android:layout_alignStart="@+id/txt_Date2"
+        android:textSize="15sp"
+        android:textColor="#000"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:id="@+id/txt_Balance"
+        android:textSize="15sp"
+        android:textColor="#000"
+        android:layout_below="@+id/txt_Location"
+        android:layout_alignStart="@+id/txt_Location"
+        android:layout_marginTop="14dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:id="@+id/txt_Date2"
+        android:layout_marginEnd="34dp"
+        android:textSize="15sp"
+        android:textColor="#000"
+        android:layout_marginBottom="12dp"
+        android:layout_above="@+id/txt_TransAmount"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>
