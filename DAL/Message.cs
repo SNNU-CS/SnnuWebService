@@ -24,7 +24,8 @@ namespace SnnuWebService.DAL
             strSql.Append("select * from Message");
             strSql.Append(" where Type='" + type + "' ");
             strSql.Append("and Date between '"+start.ToString("yyyy-MM-dd") +"' and '");
-            strSql.Append(end.ToString("yyyy-MM-dd") + "'");
+            strSql.Append(end.ToString("yyyy-MM-dd") + "' ");
+            strSql.Append("order by Date DESC");
             return SqlHelper.ExecuteReader(Conn,CommandType.Text, strSql.ToString());
         }
         public MySqlDataReader QueryByDateAndDep(DateTime start, DateTime end, string dep,string type)
