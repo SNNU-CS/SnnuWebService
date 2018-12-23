@@ -47,10 +47,13 @@ namespace SnnuWebService.DAL
         }
         public MySqlDataReader QueryByDepartment(string dep,string type)
         {
-            DateTime d = DateTime.Now;
-            DateTime start = d.AddDays(-7);
-            DateTime end = d.AddDays(7);
-            return QueryByDateAndDep(start, end, dep, type);
+            StringBuilder strSql = new StringBuilder();
+            strSql.Append("select * from Message");
+            strSql.Append(" where Type='" + type + "' ");
+            strSql.Append("and Department='" + dep + "' ");
+            strSql.Append("order by Date DESC ");
+            strSql.Append("limit 20");
+            return SqlHelper.ExecuteReader(Conn, CommandType.Text, strSql.ToString());
         }
     }
 }
