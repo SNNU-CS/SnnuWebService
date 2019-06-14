@@ -24,7 +24,8 @@ namespace SnnuWebService.DAL
             strSql.Append("select * from Message");
             strSql.Append(" where Type='" + type + "' ");
             strSql.Append("and Date between '"+start.ToString("yyyy-MM-dd") +"' and '");
-            strSql.Append(end.ToString("yyyy-MM-dd") + "'");
+            strSql.Append(end.ToString("yyyy-MM-dd") + "' ");
+            strSql.Append("order by Date DESC");
             return SqlHelper.ExecuteReader(Conn,CommandType.Text, strSql.ToString());
         }
         public MySqlDataReader QueryByDateAndDep(DateTime start, DateTime end, string dep,string type)
@@ -47,10 +48,13 @@ namespace SnnuWebService.DAL
         }
         public MySqlDataReader QueryByDepartment(string dep,string type)
         {
-            DateTime d = DateTime.Now;
-            DateTime start = d.AddDays(-7);
-            DateTime end = d.AddDays(7);
-            return QueryByDateAndDep(start, end, dep, type);
+            StringBuilder strSql = new StringBuilder();
+            strSql.Append("select * from Message");
+            strSql.Append(" where Type='" + type + "' ");
+            strSql.Append("and Department='" + dep + "' ");
+            strSql.Append("order by Date DESC ");
+            strSql.Append("limit 20");
+            return SqlHelper.ExecuteReader(Conn, CommandType.Text, strSql.ToString());
         }
     }
 }
